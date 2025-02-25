@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Data Quality Monitoring</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    
+    <!-- Navbar -->
+    <nav class="bg-blue-600 text-white py-4 text-center text-xl font-bold">
+        Automating Data Quality Monitoring in Cloud Data Warehouse with AI
+    </nav>
+
+    <!-- Dashboard Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+        
+        <!-- Forecasting Graph (Live) -->
+        <div class="bg-white p-4 rounded-lg shadow">
+            <h2 class="text-lg font-semibold mb-2">Forecasting Graph</h2>
+            <canvas id="forecastChart"></canvas>
+        </div>
+        
+        <!-- Results Table -->
+        <div class="bg-white p-4 rounded-lg shadow">
+            <h2 class="text-lg font-semibold mb-2">Results</h2>
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border px-4 py-2">Timestamp</th>
+                        <th class="border px-4 py-2">Actual Values</th>
+                        <th class="border px-4 py-2">Predicted Values</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="border px-4 py-2">99998</td><td class="border px-4 py-2">20.99</td><td class="border px-4 py-2">55.24</td></tr>
+                    <tr><td class="border px-4 py-2">99999</td><td class="border px-4 py-2">56.97</td><td class="border px-4 py-2">55.29</td></tr>
+                    <tr><td class="border px-4 py-2">100000</td><td class="border px-4 py-2">20</td><td class="border px-4 py-2">55.74</td></tr>
+                    <tr><td class="border px-4 py-2">100001</td><td class="border px-4 py-2">50</td><td class="border px-4 py-2">56.40</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Alerts (Doughnut Chart) -->
+        <div class="bg-white p-4 rounded-lg shadow">
+            <h2 class="text-lg font-semibold mb-2">Alerts</h2>
+            <canvas id="alertsChart"></canvas>
+        </div>
+
+        <!-- Anomalies Table -->
+        <div class="bg-white p-4 rounded-lg shadow">
+            <h2 class="text-lg font-semibold mb-2">Anomalies</h2>
+            <ul class="list-disc pl-4 text-sm">
+                <li><strong>Miami</strong> - Furniture, 5000 units, $200 each</li>
+                <li><strong>San Francisco</strong> - Toys, 10000 units, $1 each</li>
+                <li><strong>Boston</strong> - Sports, 500 units, $999 each</li>
+                <li><strong>Austin</strong> - Jewelry, 20000 units, $5 each</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Chart.js Scripts -->
+    <script>
+        function createAlertsChart() {
+            const ctx = document.getElementById('alertsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Standard', 'Anamolies'],
+                    datasets: [{
+                        data: [80, 20], // Change these values based on real alerts
+                        backgroundColor: ['#28a745', '#dc3545']
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+        createAlertsChart();
+        
+        function createLiveForecastChart() {
+            const ctx = document.getElementById('forecastChart').getContext('2d');
+            const forecastChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Actual values (Holdout split)',
+                        data: [],
+                        borderColor: '#6a0dad',
+                        backgroundColor: 'rgba(106, 13, 173, 0.2)',
+                        fill: true
+                    }, {
+                        label: 'Predicted values',
+                        data: [],
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                        fill: true
+                    }, {
+                        label: 'Forecast values',
+                        data: [],
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Time' } },
+                        y: { title: { display: true, text: 'Value' } }
+                    }
+                }
+            });
+            
+            function updateChart() {
+                if (forecastChart.data.labels.length > 20) {
+                    forecastChart.data.labels.shift();
+                    forecastChart.data.datasets[0].data.shift();
+                    forecastChart.data.datasets[1].data.shift();
+                    forecastChart.data.datasets[2].data.shift();
+                }
+                const newTime = new Date().toLocaleTimeString();
+                forecastChart.data.labels.push(newTime);
+                forecastChart.data.datasets[0].data.push(Math.random() * 100);
+                forecastChart.data.datasets[1].data.push(Math.random() * 100);
+                forecastChart.data.datasets[2].data.push(Math.random() * 100);
+                forecastChart.update();
+            }
+            setInterval(updateChart, 2000);
+        }
+        createLiveForecastChart();
+    </script>
+</body>
+</html>
